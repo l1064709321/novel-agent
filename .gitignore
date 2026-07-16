@@ -1,0 +1,17 @@
+# novels/ 工作区根 .gitignore
+# 整个 secrets 目录不上传 (含 token)
+secrets/
+# 小说成果正文不上传 (本地保留)
+novels/*.txt
+novels/*.md
+novels/*.docx
+novels/*.pdf
+novels/*.epub
+novels/*.html
+novels/chapters/
+novels/exports/
+# Python 缓存
+__pycache__/
+*.pyc
+*.log
+.DS_Store

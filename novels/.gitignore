@@ -1,0 +1,10 @@
+# 本地小说成果目录 (严禁上传 GitHub)
+# agent 跑完的小说正文/章节 .txt / .md 都存这里
+*.txt
+*.md
+*.docx
+*.pdf
+*.epub
+*.html
+chapters/
+exports/
