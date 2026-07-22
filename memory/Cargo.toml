@@ -1,0 +1,18 @@
+[package]
+name = "quantum-memory"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "群星 A.I. OS - 记忆系统(双层记忆 + 检索加速)"
+
+[dependencies]
+quantum-core = { path = "../core" }
+serde.workspace = true
+serde_json.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+ndarray.workspace = true

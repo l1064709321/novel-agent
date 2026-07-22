@@ -1,0 +1,30 @@
+[package]
+name = "quantum-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "群星 A.I. OS - Rust 神经认知核心(基础核心层 + 伦理 + 状态机)"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+bincode.workspace = true
+parking_lot.workspace = true
+once_cell.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+hex.workspace = true
+nalgebra.workspace = true
+rand.workspace = true
+ndarray.workspace = true
+libc.workspace = true
+rapier3d.workspace = true
+crossbeam-channel = "0.5"
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+env_logger.workspace = true

@@ -1,31 +1,26 @@
+# Rust
+/target
+**/*.rs.bk
+
+# 临时文件
+*.swp
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Cargo
+Cargo.lock.bak
+
 # Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.egg-info/
 .venv/
-venv/
-env/
 
-# 运行时数据与配置 (含密钥,不上传)
-config.yaml
-# data/ 屏蔽根目录运行时数据,但保留 app/data (技能语料库 + skills_core.py 内核,必须上传)
-/data/
-/*.db
-/*.sqlite
-/*.sqlite3
-*.db
-*.sqlite
-*.sqlite3
-
-# 日志
-*.log
-/tmp/
-.novel-agent/
-
-# 系统
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
+# 大型构建产物
+*.rlib
+*.so
+*.dylib
+*.dll

@@ -1,0 +1,15 @@
+[package]
+name = "quantum-physics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "群星 A.I. OS - 物理引擎接口(对接 C 层真实物理)"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+nalgebra.workspace = true

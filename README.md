@@ -1,188 +1,137 @@
-# Novel Agent
+# 群星 A.I. OS
 
-一个类似 Codex 的**小说创作 Agent**(Web 界面)。7 个 agent 协同,按 8 阶段工作流完成从扫榜调研到定稿入库的完整长篇创作闭环,内置「毒舌总编」审稿机制与质检打回循环。
+> **62 个模块的 AGI 操作系统,目标在旧手机 ARM 处理器上长时间稳定运行**
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+## 一、这是什么?
 
----
+这是一个**完整的 AGI 操作系统架构 + Rust/Python 实现**。
 
-## ✨ 核心特性
+- **62 个模块**涵盖:基础核心、记忆、对话、推理、成长、伙伴认知、系统适配、小脑系统
+- **物理世界模型(模块 18)** 是核心子模块之一,对 AGI 暴露"物理世界模型"接口,内部用预测编码实现
+- **伦理铁门(模块 6 + 7 + 49 + 50)** 是不可绕过的安全机制
+- **设计目标**:在旧手机 ARM 上 7×24 稳定运行,无输入时 CPU 接近 0%
 
-### 8 阶段长篇创作闭环(含审稿循环)
+## 二、当前状态
 
-| 阶段 | 名称 | 负责 agent | 说明 |
-|------|------|-----------|------|
-| 1 | 扫榜调研 | story-architect | 扫描 2026 网文市场热门榜单,分析题材趋势/流量赛道/读者画像 |
-| 2 | 拆书解构 | story-architect | 拆解对标畅销书,提取钩子/节奏/人设/文风/核心梗等可复用模块 |
-| 3 | 定文风定位 | story-architect + character-designer | 基于扫榜+拆书结论,确定文风/题材/核心梗/情绪曲线 |
-| 4 | 大纲搭建 | story-architect | 全书体量→卷纲→细纲→伏笔/时间线/角色状态追踪初始化 |
-| 5 | 正文写作 | story-explorer + narrative-writer + character-designer | 细纲优先→加载上下文→三维度揉进→字数验证→更新追踪 |
-| 6 | 毒舌编辑 | orchestrator | 总编逐章审稿,输出【毒舌评分 1-10】+【致命问题】+【裁决】 |
-| 7 | 审核质检 | consistency-checker + narrative-writer | 一致性+伏笔+去 AI 味+格式合规,**不通过打回阶段 5 重写** |
-| 8 | 定稿入库 | orchestrator | 审核通过→标记定稿→更新追踪→**循环回阶段 5 写下一章** |
+| 模块 | 状态 | 位置 |
+|------|------|------|
+| 模块 1 LIF 神经元 | ✅ 完整 | `core/src/lif/` |
+| 模块 2 卡尔曼滤波器 | ✅ 完整 | `core/src/kalman/` |
+| 模块 3 八门状态机 | ✅ 完整 | `core/src/eight_gates/` |
+| 模块 4 全局工作空间 | ✅ 完整 | `core/src/workspace/` |
+| 模块 5 内在动机 | ✅ 完整 | `core/src/motivation/` |
+| 模块 6 伦理动力学 | ✅ 完整 | `core/src/ethics/` |
+| 模块 7 存在性递归 | ✅ 完整 | `core/src/existential/` |
+| 模块 8 消息总线 | ✅ 完整 | `core/src/bus/` |
+| 模块 9 双层记忆 | ✅ 完整 | `memory/src/lib.rs` |
+| 模块 18 物理世界模型 | ✅ 完整 | `core/src/world/` |
+| C 物理引擎接口 | ⚠️ 占位 | `physics/src/lib.rs` |
+| Python 胶水层 | ✅ 完整 | `python/src/lib.rs` |
+| 模块 10-17, 19-62 | ⏳ 待开发 | — |
 
-### 7-agent 架构
+## 三、架构分层
 
-| Agent | 角色 | 沙盒权限 |
-|-------|------|---------|
-| orchestrator | 总编(全局调度 + 毒舌审稿) | read-write |
-| story-architect | 架构师(扫榜/拆书/大纲) | read-write |
-| narrative-writer | 主笔(正文 + 去 AI 味) | read-write |
-| character-designer | 角色师(人设 + 对话) | read-write |
-| consistency-checker | 质检员(一致性审查) | **read-only** |
-| story-explorer | 资料员(上下文加载) | **read-only** |
-| worldbuilder | 设定管理员(世界观/地点/时间线) | read-write |
+```
+┌─────────────────────────────────────┐
+│  Python 胶水层 (AGI 调用入口)       │ ← quantum_python (PyO3)
+├─────────────────────────────────────┤
+│  Rust 神经认知核心                  │ ← quantum-core
+│  (脉冲神经 / 伦理 / 八门 / 世界)    │
+├─────────────────────────────────────┤
+│  Rust 记忆系统                      │ ← quantum-memory
+├─────────────────────────────────────┤
+│  Rust 物理引擎胶水(对接 C)          │ ← quantum-physics
+├─────────────────────────────────────┤
+│  C 物理引擎(Box2D / Bullet / 自写)  │ ← 未来
+└─────────────────────────────────────┘
+```
 
-- **OpenClaw 模式**:agent 由后端 orchestrator 自动委派调度,前端不暴露选择器;composer 旁有 agent 芯片自动跟踪当前活跃 agent
-- **只读沙盒**:consistency-checker / story-explorer 不能调用写入工具,保证审查中立
+## 四、快速开始
 
-### UI 特性
-
-- **⌘K / Ctrl+K 命令面板**:12 个快捷命令,模糊搜索 + 方向键导航
-- **斜杠命令**:9 个(`/续写 /状态 /质检 /大纲 /设定 /润色 /清空 /设置 /导出`)
-- **Agent Panel**:右侧滑出,展示当前活跃 agent 的角色/阶段/沙盒/工具列表
-- **IDE 式文件树**:左侧章节/设定/素材库树形展示,支持展开收起
-- **多格式导出**:TXT / Markdown / Word(.docx) / HTML(可打印 PDF)
-- **多格式上传**:txt / md / docx / pdf / epub / csv,自动分块入库供检索
-
-### 模型支持
-
-内置 15 家厂商预设,前端「添加模型」一键添加:
-
-| 分类 | 平台 |
-|------|------|
-| 国际 | OpenAI(GPT-5.6)、Google Gemini、xAI Grok、Mistral |
-| 国内 | DeepSeek、通义千问、智谱 GLM、Kimi、豆包、文心 ERNIE |
-| 聚合 | 硅基流动 SiliconFlow、OpenRouter、Together AI、Fireworks AI |
-| 本地 | Ollama |
-
-- **自定义模型**:前端可填任意 `provider/model` + api_key + api_base,持久化到 `~/.novel-agent/config.yaml`
-- **模型配置持久化**:增删改模型、切换默认模型均自动落盘
-
----
-
-## 🚀 快速开始
-
-### 环境要求
-
-- Python 3.10+
-- 任一 LLM API Key(推荐 DeepSeek,国内直连且便宜)
-
-### 安装与启动
+### 4.1 编译 Rust 部分
 
 ```bash
-# 1. 克隆
-git clone https://github.com/l1064709321/novel-agent.git
-cd novel-agent
+cd quantum-ai-os
 
-# 2. 装依赖
-pip install -r requirements.txt
+# 编译所有 crate
+cargo build --release
 
-# 3. 启动(任选其一)
-python run.py                      # 直接启动
-bash start.sh                      # 一键启动(自动装依赖 + 后台运行)
+# 跑测试
+cargo test --release
+
+# 性能基准
+cargo bench
 ```
 
-打开浏览器访问 **http://localhost:8000/**
-
-### 配置模型
-
-启动后在前端「⚙ 设置」面板添加模型并填 API Key 即可,配置会自动保存到 `~/.novel-agent/config.yaml`。
-
-也可用环境变量(任选):
+### 4.2 编译 Python 扩展
 
 ```bash
-export DEEPSEEK_API_KEY="sk-xxx"     # DeepSeek
-export OPENAI_API_KEY="sk-xxx"        # OpenAI
-export GEMINI_API_KEY="xxx"          # Google Gemini
-export DASHSCOPE_API_KEY="sk-xxx"    # 通义千问
-export ZAI_API_KEY="xxx"             # 智谱 GLM
-export MOONSHOT_API_KEY="sk-xxx"     # Kimi
-export SILICONFLOW_API_KEY="sk-xxx"   # 硅基流动
+# 安装 maturin
+pip install maturin
+
+# 编译并安装到当前 Python 环境
+maturin develop --release -m python/Cargo.toml
+
+# 跑示例
+python examples/basic_run.py
 ```
 
-或编辑配置文件:
+### 4.3 在手机上跑(Android)
 
 ```bash
-cp config.example.yaml ~/.novel-agent/config.yaml
-vim ~/.novel-agent/config.yaml
+# 1. 在 PC 上交叉编译 Rust 部分给 Android ARM
+cargo build --release --target aarch64-linux-android
+
+# 2. 在手机上装 Termux + Python
+pkg install python rust
+
+# 3. 拷贝编译产物到手机
+# (用 adb push 或 scp)
+
+# 4. 在 Termux 里跑
+python basic_run.py
 ```
 
-### 使用流程
+## 五、伦理铁门
 
-1. **新建项目**:填名称/类型/文风/核心设定
-2. **(可选)上传对标书**:点顶栏「上传」,导入 txt/md/docx/pdf/epub 供拆书解构
-3. **开始创作**:在对话框输入指令,或点空状态页的快捷按钮(从扫榜开始 / 拆书解构 / 民俗悬疑大纲 / 规则怪谈大纲)
-4. **审稿循环**:阶段 6 总编毒舌审稿 → 阶段 7 质检,不通过自动打回阶段 5 重写,通过则推进下一章
-5. **导出**:章节写完后点「导出」选格式
-
----
-
-## 📁 项目结构
+这是**不可绕过**的安全机制:
 
 ```
-novel-agent/
-├── app/
-│   ├── agents.py       # 7-agent 定义 + 8 阶段工作流 + 毒舌审稿人设
-│   ├── tools.py        # 11 个工具(扫榜/拆书/大纲/续写/润色/...)
-│   ├── agent.py        # agentic loop + delegate 委派机制
-│   ├── llm.py          # litellm 封装(stream/chat)
-│   ├── config.py       # 配置 + 15 家厂商预设 + 持久化
-│   ├── store.py        # 项目/章节/设定/分块存储
-│   ├── exporter.py     # 多格式导出
-│   └── server.py       # FastAPI 路由(REST + SSE)
-├── web/
-│   ├── index.html      # OpenClaw 式布局
-│   ├── app.js          # 前端逻辑 + ⌘K + 斜杠命令
-│   └── style.css       # 书房羊皮纸风 UI
-├── config.example.yaml # 配置示例
-├── requirements.txt
-├── run.py              # 入口
-├── start.sh            # 一键启动脚本
-├── pre-upload.sh       # 上传前安全扫描脚本
-└── .gitignore
+模块 7 (存在性递归)
+    ↓ SHA-256 锁定元价值锚
+模块 6 (伦理动力学)
+    ↓ 连续 ODE 演化
+模块 49 (道德评估器)
+    ↓ 否决权
+模块 50 (RESTful API)
+    ↓ 死门/杜门时接管输出
 ```
 
----
+**任何模块都不能修改模块 6/7/49/50 的内部状态。**
 
-## 🔒 上传前安全扫描
+## 六、物理世界模型(模块 18)
 
-每次推送代码到 GitHub 前,先跑扫描脚本,避免误传密钥/token:
+**对外身份:PhysicsWorldModel(物理世界模型)**
+**内部实现:预测编码(VAE + KL surprise)**
 
-```bash
-bash pre-upload.sh
+```python
+from quantum_python import PhysicsWorldModel
+
+world = PhysicsWorldModel()
+world.add_box(id=1, x=0, y=5, z=0, mass=1.0)
+world.add_sphere(id=2, x=1, y=5, z=0, mass=0.5)
+
+# 跑 30 步
+for i in range(30):
+    surprise = world.step(0.05)
+    pos = world.get_position(1)
+    # surprise 是 KL 散度,>0.5 触发"惊讶"事件
 ```
 
-脚本会:
-1. 确认 git 仓库
-2. 检查 `.gitignore` 是否排除了 `config.yaml` / `__pycache__` / `data` / `.novel-agent` / `*.log`
-3. 扫描改动文件中的敏感信息模式(`sk-` / `sk-ant-` / `AIza` / `github_pat_` / `ghp_` / Slack token / 私钥头)
-4. 列出将要上传的文件清单
+## 七、贡献
 
-**退出码**:`0` = 干净可上传;`2` = 发现敏感信息已拦截。
+发现 bug?代码读不懂?模块设计有问题?直接发消息反馈。
 
-`.gitignore` 已排除:`config.yaml`(含密钥)、`data/`(项目数据)、`__pycache__/`、`*.log`、`.novel-agent/`。
+## 八、许可
 
----
-
-## 🛠 技术栈
-
-- **后端**:Python 3.10+ / FastAPI / litellm(多模型统一调用)
-- **前端**:原生 HTML + CSS + JavaScript(无构建步骤,无外部依赖)
-- **存储**:SQLite(轻量,零配置)
-- **LLM 接入**:litellm(支持 100+ 模型,OpenAI 协议兼容)
-
----
-
-## 📝 使用建议
-
-- **推荐模型**:DeepSeek V4-Flash(国内直连、便宜、中文好);预算充足可用 GPT-5.6-terra 或 Gemini-3.1-pro
-- **字数控制**:续写时可在指令里指定字数,如「续写 3000 字,重点写主角心理」
-- **审稿严格度**:总编评分 < 7 分会自动打回重写,可在 [agents.py](app/agents.py) 中调整阈值
-- **本地模型**:装 Ollama 后 `ollama pull qwen3:14b`,无需 API Key 即可使用
-
----
-
-## 📜 License
-
-MIT
+Apache-2.0
