@@ -47,7 +47,8 @@ pub mod rapier_bridge; // 工业级物理引擎 rapier3d 桥接
 pub mod reasoning;    // 模块 20 推理循环 + 32 不确定性 + 49 道德评估
 pub mod reflection;   // 真自我反思模块
 pub mod sandbox_genuine; // 真涌现沙箱桥接(用真证据累积代替假货剧本)
-pub mod world;        // 模块 18 物理世界模型(对外身份)
+pub mod true_world_model; // 真物理世界模型(rapier 后端 + 关节 + 接触力 + 流体)
+pub mod world;        // 模块 18 物理世界模型(对外身份,简化版)
 pub mod workspace;    // 模块 4 全局工作空间
 
 pub use bus::{CognitiveMessage, MessageBus, MessageTopic, EthicalSignature};
